@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "eucalyptus": {
+      "type": "http",
+      "url": "https://eucalyptus.qdo.ee/api/mcp"
+    }
+  }
+}

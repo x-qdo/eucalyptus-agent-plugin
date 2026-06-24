@@ -1,0 +1,13 @@
+interface:
+  display_name: "Eucalyptus"
+  short_description: "Turn Excel workbooks into APIs"
+  default_prompt: "Use $eucalyptus to inspect Excel-backed API models, upload a workbook version, and run a playground calculation."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "eucalyptus"
+      description: "Eucalyptus MCP server for Excel workbook model, version, playground, logs, and metrics workflows"
+      transport: "streamable_http"
+      url: "https://eucalyptus.qdo.ee/api/mcp"
+policy:
+  allow_implicit_invocation: true

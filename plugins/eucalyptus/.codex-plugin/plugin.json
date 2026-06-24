@@ -1,0 +1,25 @@
+{
+  "name": "eucalyptus",
+  "version": "0.1.0",
+  "description": "Turn Excel workbooks into API-backed Eucalyptus calculation models through the Eucalyptus MCP server.",
+  "author": {
+    "name": "QDO"
+  },
+  "homepage": "https://github.com/x-qdo/eucalyptus-agent-plugin",
+  "repository": "https://github.com/x-qdo/eucalyptus-agent-plugin",
+  "keywords": ["eucalyptus", "excel", "models", "api", "mcp"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Eucalyptus",
+    "shortDescription": "Turn Excel workbooks into APIs",
+    "longDescription": "Install Eucalyptus workflows for uploading Excel workbooks, compiling model IO, running playground calculations, setting API destination defaults, and reading logs or metrics.",
+    "developerName": "QDO",
+    "category": "Developer Tools",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Use Eucalyptus to list my Excel-backed API models and summarize the available compiled versions.",
+      "Use Eucalyptus to upload this workbook as a new API model version and run a playground calculation."
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}

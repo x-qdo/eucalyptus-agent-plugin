@@ -1,0 +1,14 @@
+{
+  "name": "eucalyptus",
+  "displayName": "Eucalyptus",
+  "version": "0.1.0",
+  "description": "Turn Excel workbooks into API-backed Eucalyptus calculation models through the Eucalyptus MCP server.",
+  "author": {
+    "name": "QDO"
+  },
+  "homepage": "https://github.com/x-qdo/eucalyptus-agent-plugin",
+  "repository": "https://github.com/x-qdo/eucalyptus-agent-plugin",
+  "keywords": ["eucalyptus", "excel", "models", "api", "mcp"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

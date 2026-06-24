@@ -1,0 +1,23 @@
+{
+  "name": "qdo-eucalyptus",
+  "owner": {
+    "name": "QDO"
+  },
+  "description": "QDO Eucalyptus agent plugins",
+  "plugins": [
+    {
+      "name": "eucalyptus",
+      "displayName": "Eucalyptus",
+      "source": "./plugins/eucalyptus",
+      "description": "Turn Excel workbooks into API-backed Eucalyptus calculation models through MCP.",
+      "version": "0.1.0",
+      "author": {
+        "name": "QDO"
+      },
+      "homepage": "https://github.com/x-qdo/eucalyptus-agent-plugin",
+      "repository": "https://github.com/x-qdo/eucalyptus-agent-plugin",
+      "category": "Developer Tools",
+      "keywords": ["eucalyptus", "excel", "models", "api", "mcp"]
+    }
+  ]
+}
