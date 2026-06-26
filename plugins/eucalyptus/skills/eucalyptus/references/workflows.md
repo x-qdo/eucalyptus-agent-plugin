@@ -48,7 +48,7 @@ Use this for Codex, Claude Code, local files on macOS/Linux/Windows, and other g
 5. Call `calc.versions.confirm_upload` with the returned `model_id`, `version`, and `s3_key`.
 6. Call `calc.versions.discover_io` with the confirmed `model_id` and `version`.
 7. Show the discovered input/output names and value addresses to the user for confirmation before compile. Keep the summary compact.
-8. Convert confirmed `discovered_io.inputs` and `discovered_io.outputs` to the `inputs` and `outputs` arrays for `calc.versions.compile`.
+8. Call `calc.versions.compile` with the confirmed `discovered_io.inputs` as `inputs` and confirmed `discovered_io.outputs` as `outputs`. Pass the selected discovery cell objects unchanged unless the user rejects or edits a cell.
 9. Poll `calc.versions.get` until the compile state is final.
 10. If the user asked to promote it, call `calc.destinations.list`, choose the requested destination, then call `calc.versions.set_default_for_destination`.
 
@@ -58,7 +58,21 @@ If the environment cannot perform the direct PUT, stop after `prepare_upload` an
 
 Compile expects `inputs` and `outputs` arrays that define the workbook cells exposed by the API. Prefer the workbook's known IO spec when the user provides one. Otherwise call `calc.versions.discover_io` after upload confirmation and ask the user to confirm the detected `IN_*` and `OUT_*` cells before compiling. Do not make `compile` silently discover IO.
 
-Map each confirmed discovered cell to compile IO shape as: `name` = discovered `name`, `address` = discovered `value_address`, `sheet` = discovered `sheet`, and `default_value` = discovered `current_value` when present. Omit or edit cells the user rejects before calling `calc.versions.compile`.
+For discovered IO, pass confirmed cells in the same shape returned by `calc.versions.discover_io`:
+
+```json
+{
+  "name": "policy.dateInception",
+  "sheet": "IO_Mapping",
+  "label_address": "IO_Mapping!B59",
+  "value_address": "IO_Mapping!C59",
+  "current_value": "1900-01-01"
+}
+```
+
+The MCP server normalizes this shape during compile: `value_address` becomes the backend cell `address`, `current_value` becomes `default_value`, `name` and `sheet` are kept, and `label_address` is accepted but ignored. Legacy compile cells shaped as `{ "name": "...", "address": "...", "sheet": "...", "default_value": "..." }` are still accepted for compatibility, but discovery cells are preferred. Never pass arrays of strings such as `["policy.dateInception"]`.
+
+Omit or edit cells the user rejects before calling `calc.versions.compile`.
 
 ## Playground Calculation
 

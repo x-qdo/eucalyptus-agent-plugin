@@ -23,6 +23,8 @@ For Excel workbook uploads, choose the reference by host:
 
 Before creating a model or uploading a replacement workbook version, confirm the model locale/regional settings. Locale controls text-date, decimal, grouping, and currency interpretation and must be set before upload/compile workflows when it needs to change.
 
+After workbook upload, call `calc.versions.discover_io` and ask the user to confirm the detected cells. `calc.versions.compile` accepts confirmed `discover_io` cells directly; do not reduce them to string name arrays.
+
 For writes, state the intended model, version, and destination before calling the mutating tool. Never offer deletion; deletion is not available through this MCP server.
 
 Before changing a destination default or explaining where execution/logs will run, read `references/destinations.md`.
