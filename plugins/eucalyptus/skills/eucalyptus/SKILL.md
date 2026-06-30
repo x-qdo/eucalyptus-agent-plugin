@@ -23,7 +23,7 @@ For Excel workbook uploads, choose the reference by host:
 
 Before creating a model or uploading a replacement workbook version, confirm the model locale/regional settings. Locale controls text-date, decimal, grouping, and currency interpretation and must be set before upload/compile workflows when it needs to change.
 
-After workbook upload, call `calc.versions.discover_io` and ask the user to confirm the detected cells. `calc.versions.compile` accepts confirmed `discover_io` cells directly; do not reduce them to string name arrays.
+After workbook upload, call `calc.versions.discover_io` in its default compact summary mode and ask the user to confirm the detected counts/samples. Use `detail: "names"` with `name_contains` or pagination when checking specific IO names. For unchanged discovered IO, call `calc.versions.compile` with `use_discovered_io: true` instead of re-emitting every cell. For edited IO, keep `use_discovered_io: true` and pass sparse compact `inputs` / `outputs` object maps keyed by IO name. Compile does not accept IO arrays or string name arrays.
 
 For writes, state the intended model, version, and destination before calling the mutating tool. Never offer deletion; deletion is not available through this MCP server.
 

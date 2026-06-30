@@ -7,16 +7,16 @@ Use this workflow only when the host provides a ChatGPT Apps file parameter for 
 1. Confirm the user wants to turn the attached `.xlsx` or `.xlsb` workbook into a new API model version under the target `model_id`.
 2. Confirm the model locale before upload. If it must change for this workbook, call `calc.models.update_info` with `regional_settings` before `calc.versions.upload_file`; see `workflows.md` for locale details.
 3. Call `calc.versions.upload_file` with `model_id` and the host-provided `workbook_file` parameter.
-4. Call `calc.versions.discover_io` with the returned draft `version`.
-5. Show the detected `IN_*` and `OUT_*` cells to the user for confirmation.
-6. Call `calc.versions.compile` with confirmed `discovered_io.inputs` as `inputs` and confirmed `discovered_io.outputs` as `outputs`. Pass the selected discovery cell objects unchanged unless the user rejects or edits a cell.
+4. Call `calc.versions.discover_io` with the returned draft `version`. Use the default compact summary first.
+5. Show the detected `IN_*` and `OUT_*` counts and samples to the user for confirmation. Use `detail: "names"` with filters/pagination only when the user needs to inspect specific IO names.
+6. If the user confirms the discovered IO unchanged, call `calc.versions.compile` with `use_discovered_io: true`. For edited IO, keep `use_discovered_io: true` and pass sparse compact `inputs` / `outputs` object maps keyed by IO name.
 7. Poll `calc.versions.get` until compile succeeds or fails.
 8. Set the destination default only when the user explicitly asks; read `destinations.md` first.
 9. When checking logs after playground execution, search the account primary/default runtime destination first. Playground logs are not necessarily under `saas`.
 
 ## File Parameter
 
-The MCP tool advertises `_meta["openai/fileParams"]` for `workbook_file`. Use the host-provided file object; do not download or re-upload the file manually unless the host cannot pass file parameters. After upload, discovery is still explicit through `calc.versions.discover_io`; `compile` should receive user-confirmed IO cells in the same discovery shape. The server normalizes `value_address` to the backend address and `current_value` to the backend default value. Never pass string name arrays.
+The MCP tool advertises `_meta["openai/fileParams"]` for `workbook_file`. Use the host-provided file object; do not download or re-upload the file manually unless the host cannot pass file parameters. After upload, discovery is still explicit through compact `calc.versions.discover_io`; for unchanged discovered IO, compile with `use_discovered_io: true` so large specs stay server-side. Compile accepts compact object maps keyed by IO name, where values are address strings or compact cell objects. It does not accept IO arrays or string name arrays.
 
 ## Boundaries
 

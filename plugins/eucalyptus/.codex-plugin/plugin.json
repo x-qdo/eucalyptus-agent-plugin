@@ -1,6 +1,6 @@
 {
   "name": "eucalyptus",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Turn Excel workbooks into API-backed Eucalyptus calculation models through MCP upload, IO discovery, compile, playground, and saved-test workflows.",
   "author": {
     "name": "QDO"

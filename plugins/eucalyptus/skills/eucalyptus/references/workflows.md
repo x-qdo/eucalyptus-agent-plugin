@@ -46,31 +46,95 @@ Use this for Codex, Claude Code, local files on macOS/Linux/Windows, and other g
 3. Call `calc.versions.prepare_upload` with `model_id` and `filename`.
 4. Upload the local file bytes to the returned `upload_url` using exactly the returned `content_type` if present. Do not send the workbook anywhere else.
 5. Call `calc.versions.confirm_upload` with the returned `model_id`, `version`, and `s3_key`.
-6. Call `calc.versions.discover_io` with the confirmed `model_id` and `version`.
-7. Show the discovered input/output names and value addresses to the user for confirmation before compile. Keep the summary compact.
-8. Call `calc.versions.compile` with the confirmed `discovered_io.inputs` as `inputs` and confirmed `discovered_io.outputs` as `outputs`. Pass the selected discovery cell objects unchanged unless the user rejects or edits a cell.
-9. Poll `calc.versions.get` until the compile state is final.
-10. If the user asked to promote it, call `calc.destinations.list`, choose the requested destination, then call `calc.versions.set_default_for_destination`.
+6. Call `calc.versions.discover_io` with the confirmed `model_id` and `version`. Use the default compact `summary` detail first.
+7. Show the discovered input/output counts and samples to the user for confirmation before compile. If the user needs to check specific names, call `calc.versions.discover_io` again with `detail: "names"`, `kind`, `name_contains`, `limit`, and `offset` instead of fetching full cells.
+8. If the user confirms the discovered IO unchanged, call `calc.versions.compile` with `use_discovered_io: true`. This keeps large IO specs server-side instead of forcing the agent to re-emit every discovered cell as a tool-call parameter.
+9. If the user rejects or edits cells, keep `use_discovered_io: true` and pass sparse compact `inputs` / `outputs` object maps keyed by IO name. Set a name to `null` to remove a discovered cell.
+10. Poll `calc.versions.get` until the compile state is final.
+11. If the user asked to promote it, call `calc.destinations.list`, choose the requested destination, then call `calc.versions.set_default_for_destination`.
 
 If the environment cannot perform the direct PUT, stop after `prepare_upload` and tell the user the direct upload step is blocked.
 
 ## IO Specification
 
-Compile expects `inputs` and `outputs` arrays that define the workbook cells exposed by the API. Prefer the workbook's known IO spec when the user provides one. Otherwise call `calc.versions.discover_io` after upload confirmation and ask the user to confirm the detected `IN_*` and `OUT_*` cells before compiling. Do not make `compile` silently discover IO.
+Compile expects `use_discovered_io: true` and/or compact `inputs` / `outputs` object maps keyed by API field name. Prefer unchanged discovered IO when possible. If the user provides a known IO spec, express it as object maps, not arrays. Otherwise call `calc.versions.discover_io` after upload confirmation and ask the user to confirm the detected `IN_*` and `OUT_*` cells before compiling.
 
-For discovered IO, pass confirmed cells in the same shape returned by `calc.versions.discover_io`:
+`calc.versions.discover_io` is compact by default:
 
 ```json
 {
-  "name": "policy.dateInception",
-  "sheet": "IO_Mapping",
-  "label_address": "IO_Mapping!B59",
-  "value_address": "IO_Mapping!C59",
-  "current_value": "1900-01-01"
+  "model_id": "model-id",
+  "version": 34
 }
 ```
 
-The MCP server normalizes this shape during compile: `value_address` becomes the backend cell `address`, `current_value` becomes `default_value`, `name` and `sheet` are kept, and `label_address` is accepted but ignored. Legacy compile cells shaped as `{ "name": "...", "address": "...", "sheet": "...", "default_value": "..." }` are still accepted for compatibility, but discovery cells are preferred. Never pass arrays of strings such as `["policy.dateInception"]`.
+Default discovery returns counts and small samples, not full cell arrays. To inspect specific cells without a large response, use filtered compact rows:
+
+```json
+{
+  "model_id": "model-id",
+  "version": 34,
+  "detail": "names",
+  "kind": "outputs",
+  "name_contains": "financials.premium",
+  "limit": 25
+}
+```
+
+For unchanged discovered IO, prefer:
+
+```json
+{
+  "model_id": "model-id",
+  "version": 34,
+  "use_discovered_io": true
+}
+```
+
+This is the default for real workbook uploads because discovered IO specs can be too large for reliable LLM tool-call generation. `use_discovered_io` re-runs discovery server-side against the uploaded version and compiles the discovered value cells; it does not require the agent to copy `label_address`, `current_value`, or hundreds of cell objects back into the compile call.
+
+For small discovered-IO edits, keep the discovered base and pass only changed names:
+
+```json
+{
+  "model_id": "model-id",
+  "version": 34,
+  "use_discovered_io": true,
+  "inputs": {
+    "policy.dateInception": {
+      "value_address": "IO_Mapping!C59",
+      "sheet": "IO_Mapping",
+      "default_value": "1900-01-01"
+    },
+    "legacy.unusedInput": null
+  },
+  "outputs": {
+    "debug.trace": null
+  }
+}
+```
+
+For a full custom spec, pass object maps where each value is either a workbook address string or a compact cell object:
+
+```json
+{
+  "model_id": "model-id",
+  "version": 34,
+  "inputs": {
+    "policy.dateInception": "IO_Mapping!C59",
+    "policy.region": {
+      "value_address": "IO_Mapping!C60",
+      "sheet": "IO_Mapping",
+      "default_value": "EE"
+    }
+  },
+  "outputs": {
+    "premium.total": "IO_Mapping!C120"
+  }
+}
+```
+
+The MCP server normalizes map values during compile: `value_address` becomes the backend cell `address`, `current_value` becomes `default_value`, and the map key supplies the IO `name`. Compile does not accept IO arrays or string name arrays.
 
 Omit or edit cells the user rejects before calling `calc.versions.compile`.
 
