@@ -1,7 +1,7 @@
 interface:
   display_name: "Eucalyptus"
   short_description: "Turn Excel workbooks into APIs"
-  default_prompt: "Use $eucalyptus to inspect Excel-backed API models, choose locale, upload a workbook, discover IO, compile, run playground, manage saved tests, and manage destination defaults."
+  default_prompt: "Use $eucalyptus to inspect Excel-backed API models, choose locale, upload a workbook, discover IO, compile, run playground, manage saved tests, manage destination defaults, and archive safely replaced development versions while preserving historical production use."
 dependencies:
   tools:
     - type: "mcp"

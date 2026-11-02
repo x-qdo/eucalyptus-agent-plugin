@@ -4,7 +4,7 @@ Public plugin marketplace for Eucalyptus workflows in Codex and Claude Code. Euc
 
 The plugin bundles:
 
-- an `eucalyptus` skill with the Excel-to-API workflow guide
+- an `eucalyptus` skill with the Excel-to-API workflow guide and safe cleanup of replaced development versions
 - an Eucalyptus MCP server configuration
 - Codex and Claude Code plugin manifests
 - Codex and Claude marketplace catalogs
@@ -47,3 +47,5 @@ Example:
 ```text
 /eucalyptus:eucalyptus list my Excel-backed API models and summarize ids, aliases, and defaults
 ```
+
+Version archival requires an MCP endpoint exposing `calc.versions.archive` and `calc.versions.unarchive`. Versions ever used on `prod*` destinations, including old revisions referenced by policies, remain active.

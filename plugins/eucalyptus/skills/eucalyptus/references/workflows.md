@@ -52,6 +52,7 @@ Use this for Codex, Claude Code, local files on macOS/Linux/Windows, and other g
 9. If the user rejects or edits cells, keep `use_discovered_io: true` and pass sparse compact `inputs` / `outputs` object maps keyed by IO name. Set a name to `null` to remove a discovered cell.
 10. Poll `calc.versions.get` until the compile state is final.
 11. If the user asked to promote it, call `calc.destinations.list`, choose the requested destination, then call `calc.versions.set_default_for_destination`.
+12. After successful compilation and the requested checks, follow **Replaced Development Versions** below for superseded development uploads.
 
 If the environment cannot perform the direct PUT, stop after `prepare_upload` and tell the user the direct upload step is blocked.
 
@@ -187,3 +188,19 @@ Logs and metrics are destination-scoped. Before investigating a playground run, 
 Execution logs are asynchronous. Recent playground or API executions may take up to 3 minutes to appear in `calc.logs.search`; if a just-run execution is missing, say it may still be ingesting and retry before concluding there are no logs.
 
 Use `calc.metrics.get` for dashboard, model, aggregate, cache, or hourly summaries. Ask for a month or date when the requested metric requires one.
+
+## Replaced Development Versions
+
+Avoid leaving every iteration active. Track the versions this task creates and which versions each replacement supersedes. Once the replacement is compiled and passes the requested playground/saved-test checks, archive superseded development versions with `calc.versions.archive` using their base version number. Archival includes all revisions, is reversible, and keeps the active version list useful.
+
+Before each archive:
+
+1. Fetch the current model defaults, version list and destinations. Keep any version or revision that is still a destination default. Do not change a default just to make cleanup possible.
+2. Preserve any version whose base or revisions have **ever** received a call on a destination whose ID or name starts with `prod` (case-insensitive). A call years ago still matters: existing policies can depend on that version. Playground calls on a production primary destination count too. Moving the default to a replacement does not release this protection.
+3. Establish complete history. For temporary versions created in this task, use the tracked uploads, calls and returned destination usage, allowing for asynchronous ingestion. For older versions, an empty log search or a year of logs does not prove they were never used in production. If complete history is unavailable, keep the version active and explain the uncertainty. Never bypass a server refusal.
+4. Keep the previous version if its replacement failed compilation or validation, if it is explicitly retained for ongoing work, or if the user asked to retain it.
+5. State the model and version being archived, call `calc.versions.archive`, then report the result. Housekeeping of eligible temporary versions is part of the authorized replacement workflow; do not ask for a redundant confirmation.
+
+Use `calc.versions.list` with `include_archived: true` to find archived versions. Restore with `calc.versions.unarchive`; inspect `recompiling` and `not_queued` before saying it is ready for every destination. Archival keeps existing files but stops preparing the version for new engines. It is not deletion.
+
+If lifecycle tools are unavailable on an older endpoint, report that cleanup is pending and retain the versions. Do not invent REST calls or use deletion as a substitute.

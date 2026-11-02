@@ -9,8 +9,8 @@
       "name": "eucalyptus",
       "displayName": "Eucalyptus",
       "source": "./plugins/eucalyptus",
-      "description": "Turn Excel workbooks into API-backed Eucalyptus calculation models through MCP upload, compile, playground, and saved-test workflows.",
-      "version": "0.1.5",
+      "description": "Turn Excel workbooks into API-backed Eucalyptus calculation models through MCP upload, compile, playground, saved-test, and reversible version-archival workflows.",
+      "version": "0.1.6",
       "author": {
         "name": "QDO"
       },
