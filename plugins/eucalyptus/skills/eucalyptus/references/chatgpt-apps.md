@@ -12,7 +12,8 @@ Use this workflow only when the host provides a ChatGPT Apps file parameter for 
 6. If the user confirms the discovered IO unchanged, call `calc.versions.compile` with `use_discovered_io: true`. For edited IO, keep `use_discovered_io: true` and pass sparse compact `inputs` / `outputs` object maps keyed by IO name.
 7. Poll `calc.versions.get` until compile succeeds or fails.
 8. Set the destination default only when the user explicitly asks; read `destinations.md` first.
-9. When checking logs after playground execution, search the account primary/default runtime destination first. Playground logs are not necessarily under `saas`.
+9. After validating a replacement, follow **Replaced Development Versions** in `workflows.md` to archive superseded development uploads. Preserve historical production use and uncertain history.
+10. When checking logs after playground execution, search the account primary/default runtime destination first. Playground logs are not necessarily under `saas`.
 
 ## File Parameter
 

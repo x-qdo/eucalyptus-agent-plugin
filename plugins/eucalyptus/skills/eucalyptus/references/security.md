@@ -22,6 +22,7 @@ Allowed:
 - create or update model metadata
 - upload Excel workbook versions
 - compile versions
+- reversibly archive superseded development versions and restore archived versions under the replacement-workflow rules
 - run playground calculations
 - set a compiled version as the default for one destination
 

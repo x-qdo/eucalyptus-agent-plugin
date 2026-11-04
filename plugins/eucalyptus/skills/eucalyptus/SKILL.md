@@ -1,6 +1,6 @@
 ---
 name: eucalyptus
-description: "Use when working with Eucalyptus to turn Excel workbooks into API-backed calculation models through the Eucalyptus MCP server: list or inspect models and versions, choose locale/regional settings, upload Excel workbook versions, discover IN_/OUT_ cells, compile IO specs, run playground calculations, create/update/run saved tests, inspect test results/history, set API destination defaults, or read execution logs and metrics. Do not use for deleting models, versions, or tests, token/user administration, arbitrary REST/S3/Lambda calls, or unrelated Excel debugging."
+description: "Use when working with Eucalyptus to turn Excel workbooks into API-backed calculation models through the Eucalyptus MCP server: list or inspect models and versions, choose locale/regional settings, upload Excel workbook versions, discover IN_/OUT_ cells, compile IO specs, run playground calculations, create/update/run saved tests, inspect test results/history, set API destination defaults, archive or restore versions, or read execution logs and metrics. Do not use for deleting models, versions, or tests, token/user administration, arbitrary REST/S3/Lambda calls, or unrelated Excel debugging."
 ---
 
 # Eucalyptus
@@ -27,12 +27,14 @@ After workbook upload, call `calc.versions.discover_io` in its default compact s
 
 For writes, state the intended model, version, and destination before calling the mutating tool. Never offer deletion; deletion is not available through this MCP server.
 
+After successfully validating a replacement, follow the **Replaced Development Versions** section in `references/workflows.md` to archive superseded development versions. This is reversible housekeeping within the replacement task; report what was archived and how to restore it. Preserve every version ever used on a `prod*` destination and every version with uncertain history.
+
 Before changing a destination default or explaining where execution/logs will run, read `references/destinations.md`.
 
 ## Tool Map
 
 - Models: `calc.models.list`, `calc.models.get`, `calc.models.create`, `calc.models.update_info`.
-- Versions: `calc.versions.list`, `calc.versions.get`, `calc.versions.prepare_upload`, `calc.versions.confirm_upload`, `calc.versions.upload_file`, `calc.versions.discover_io`, `calc.versions.compile`.
+- Versions: `calc.versions.list`, `calc.versions.get`, `calc.versions.prepare_upload`, `calc.versions.confirm_upload`, `calc.versions.upload_file`, `calc.versions.discover_io`, `calc.versions.compile`, `calc.versions.archive`, `calc.versions.unarchive`.
 - Execution: `calc.versions.execute_playground`.
 - Tests: `calc.tests.list`, `calc.tests.get`, `calc.tests.create`, `calc.tests.update`, `calc.tests.run`, `calc.tests.run_model_version`, `calc.tests.results`, `calc.tests.version_results`.
 - Defaults: `calc.destinations.list`, `calc.versions.set_default_for_destination`.
